@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+         #
+#    By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/12/18 14:31:51 by brunogue          #+#    #+#              #
-#    Updated: 2025/12/18 14:41:34 by brunogue         ###   ########.fr        #
+#    Updated: 2026/01/16 19:09:11 by sdavi-al         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,9 +14,13 @@ NAME = webserv
 
 CC = c++
 
-SRCS = srcs/main.cpp
+SRCS =  srcs/Client.cpp \
+		srcs/main_loop.cpp \
+		srcs/main.cpp \
+		srcs/Request.cpp \
+		srcs/socket.cpp
 
-FLAGS = -Wall -Wextra -Werror -std=c++98
+FLAGS = -Wall -Wextra -Werror -std=c++98 -I./includes
 
 OBJS_FOLDER = ./objs/
 

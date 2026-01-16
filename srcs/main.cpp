@@ -3,16 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 14:31:56 by brunogue          #+#    #+#             */
-/*   Updated: 2025/12/18 14:33:56 by brunogue         ###   ########.fr       */
+/*   Updated: 2026/01/16 19:05:17 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/Webserv.hpp"
+#include <iostream>
 
-int main ()
-{
-	std::cout << "its working" << std::endl;
+void runServer();
+int main() {
+    try
+	{
+        runServer();
+    } catch (std::exception &e)
+	{
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    return 0;
 }

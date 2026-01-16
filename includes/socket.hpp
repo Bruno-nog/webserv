@@ -1,19 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Webserv.hpp                                        :+:      :+:    :+:   */
+/*   socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/18 14:32:16 by brunogue          #+#    #+#             */
-/*   Updated: 2025/12/18 14:33:06 by brunogue         ###   ########.fr       */
+/*   Created: 2026/01/16 18:48:27 by sdavi-al          #+#    #+#             */
+/*   Updated: 2026/01/16 18:48:37 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WEBSERV_HPP
-#define WEBSERV_HPP
+#ifndef SOCKET_HPP
+#define SOCKET_HPP
 
-#include <iostream>
+#include <stdexcept>
+#include <fcntl.h>
 
+void setNonBlocking(int fd);
+int setupServer(int port);
 
 #endif
