@@ -6,7 +6,7 @@
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 11:12:20 by sdavi-al          #+#    #+#             */
-/*   Updated: 2026/01/17 11:47:39 by sdavi-al         ###   ########.fr       */
+/*   Updated: 2026/01/17 12:51:22 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,30 +30,28 @@ void ConfigParser::tokenize()
         size_t commentPos = line.find('#');
         if (commentPos != std::string::npos)
             line = line.substr(0, commentPos);
-
+        std::string buffer;
         for (size_t i = 0; i < line.length(); i++)
         {
-            if (line[i] == '{' || line[i] == '}' || line[i] == ';') {
+            if (line[i] == '{' || line[i] == '}' || line[i] == ';')
+            {
+                buffer += ' ';
+                buffer += line[i];
+                buffer += ' ';
+            }
+            else
+            {
+                buffer += line[i];
             }
         }
-        
-        std::stringstream ss(line);
+        std::stringstream ss(buffer);
         std::string token;
         while (ss >> token)
         {
-            size_t start = 0;
-            for (size_t i = 0; i < token.length(); i++)
-            {
-                if (token[i] == ';' || token[i] == '{' || token[i] == '}') {
-                    if (i > start) _tokens.push_back(token.substr(start, i - start));
-                    _tokens.push_back(std::string(1, token[i]));
-                    start = i + 1;
-                }
-            }
-            if (start < token.length())
-                _tokens.push_back(token.substr(start));
+            _tokens.push_back(token);
         }
     }
+    file.close();
 }
 
 std::string ConfigParser::nextToken()
@@ -147,34 +145,41 @@ void ConfigParser::parseLocation(ServerConfig& server)
     
     if (nextToken() != "{") throw std::runtime_error("Expected '{' after location path");
 
-    while (_currentTokenIndex < _tokens.size()) {
+    while (_currentTokenIndex < _tokens.size())
+    {
         std::string token = nextToken();
 
-        if (token == "}") {
+        if (token == "}")
+        {
             server.locations.push_back(loc);
             return;
         }
 
-        if (token == "root") {
+        if (token == "root")
+        {
             loc.root = nextToken();
             if (nextToken() != ";") throw std::runtime_error("Expected ';' after root");
         }
-        else if (token == "index") {
+        else if (token == "index")
+        {
             loc.index = nextToken();
             if (nextToken() != ";") throw std::runtime_error("Expected ';' after index");
         }
-        else if (token == "autoindex") {
+        else if (token == "autoindex")
+        {
             std::string val = nextToken();
             loc.autoindex = (val == "on");
             if (nextToken() != ";") throw std::runtime_error("Expected ';' after autoindex");
         }
-        else if (token == "allow_methods") {
+        else if (token == "allow_methods")
+        {
             while (peekToken() != ";") {
                 loc.allow_methods.push_back(nextToken());
             }
             nextToken();
         }
-        else if (token == "return") {
+        else if (token == "return")
+        {
             loc.return_url = nextToken();
             if (nextToken() != ";") throw std::runtime_error("Expected ';' after return");
         }
