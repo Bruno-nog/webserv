@@ -6,13 +6,13 @@
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 18:48:45 by sdavi-al          #+#    #+#             */
-/*   Updated: 2026/01/17 16:56:23 by sdavi-al         ###   ########.fr       */
+/*   Updated: 2026/01/19 15:10:51 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket.hpp"
-#include "../includes/Client.hpp"
-#include "../includes/Config.hpp"
+#include "Client.hpp"
+#include "Config.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <poll.h>
@@ -145,7 +145,7 @@ void runServer(const std::vector<ServerConfig>& servers)
                 if (client->hasResponseToSend())
                 {
                     int sent_bytes = send(fds[i].fd, client->getResponseData(), client->getResponseSize(), 0);
-                    
+                    client->getRequest().debugPrint();
                     if (sent_bytes > 0)
                     {
                         client->markBytesSent(sent_bytes);
