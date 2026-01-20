@@ -6,11 +6,12 @@
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/17 16:28:03 by sdavi-al          #+#    #+#             */
-/*   Updated: 2026/01/19 17:17:07 by sdavi-al         ###   ########.fr       */
+/*   Updated: 2026/01/20 12:10:25 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+#include "CgiHandler.hpp"
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -172,11 +173,12 @@ void Response::generateResponse()
 {
     LocationConfig* location = _matchLocation(_request.getPath());
     
-    std::string root = _serverConfig.root;
+    std::string root = _serverConfig.root; 
     if (location && !location->root.empty())
     {
         root = location->root;
     }
+
     if (location && !location->return_url.empty())
     {
         _statusCode = 301;
@@ -207,10 +209,8 @@ void Response::generateResponse()
 
     std::string fullPath = root + _request.getPath();
 
-    if (_isDirectory(fullPath))
-    {
-
-        std::string indexFile = "index.html";
+    if (_isDirectory(fullPath)) {
+        std::string indexFile = "index.html"; 
         if (location && !location->index.empty()) indexFile = location->index;
 
         std::string indexPath = fullPath;
@@ -237,6 +237,47 @@ void Response::generateResponse()
         }
     }
 
+    std::string extension = "";
+    size_t dotPos = fullPath.find_last_of('.');
+    if (dotPos != std::string::npos)
+    {
+        extension = fullPath.substr(dotPos);
+    }
+
+    if (extension == ".py" || extension == ".php")
+    {
+        
+        if (!_fileExists(fullPath))
+        {
+            _buildErrorResponse(404);
+            return;
+        }
+
+        std::string interpreter = "/usr/bin/python3"; 
+        if (extension == ".php") interpreter = "/usr/bin/php-cgi";
+
+        try
+        {
+            CgiHandler cgi(_request, fullPath, interpreter);
+            std::string cgiOutput = cgi.execute();
+            
+            if (cgiOutput.find("HTTP/1.1") == std::string::npos)
+            {
+                _statusCode = 200;
+                _responseContent = "HTTP/1.1 200 OK\r\n" + cgiOutput;
+            } else
+            {
+                _responseContent = cgiOutput;
+            }
+            return;
+
+        } catch (std::exception &e) {
+            std::cerr << "CGI Execution Error: " << e.what() << std::endl;
+            _buildErrorResponse(500);
+            return;
+        }
+    }
+
     if (_request.getMethod() == "GET")
     {
         if (_fileExists(fullPath))
@@ -250,14 +291,13 @@ void Response::generateResponse()
             _buildErrorResponse(404);
         }
     }
-
     else if (_request.getMethod() == "DELETE")
     {
         if (_fileExists(fullPath))
         {
             if (remove(fullPath.c_str()) == 0)
             {
-                _statusCode = 204;
+                _statusCode = 204; 
                 _responseContent = "HTTP/1.1 204 No Content\r\n\r\n";
             } else
             {
@@ -268,10 +308,8 @@ void Response::generateResponse()
             _buildErrorResponse(404);
         }
     }
-
     else if (_request.getMethod() == "POST")
     {
-
         if (_request.getBody().size() > _serverConfig.client_max_body_size)
         {
             _buildErrorResponse(413);
@@ -283,8 +321,8 @@ void Response::generateResponse()
         {
             uploadDir = location->upload_path;
         }
-
-        std::string filename = uploadDir + "/uploaded_file_" + intToString(rand() % 1000);
+        
+        std::string filename = uploadDir + "/upload_" + intToString(clock());
         
         std::ofstream outfile(filename.c_str(), std::ios::binary);
         if (outfile.is_open())
@@ -292,7 +330,7 @@ void Response::generateResponse()
             outfile << _request.getBody();
             outfile.close();
             
-            std::string msg = "File uploaded successfully";
+            std::string msg = "File uploaded successfully to " + filename;
             _statusCode = 201;
             _responseContent = _buildHeader(msg.size(), "text/plain") + msg;
         } else
