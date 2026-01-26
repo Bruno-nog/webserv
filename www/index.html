@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webserv Control Panel</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --accent-color: #4CAF50;
+            --danger-color: #f44336;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { margin-bottom: 30px; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h2 { margin-top: 0; color: var(--accent-color); font-size: 1.2rem; }
+
+        input[type="text"], input[type="file"] {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #333;
+            color: white;
+            width: 90%;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.8; }
+
+        .btn-upload { background-color: var(--accent-color); color: white; }
+        .btn-delete { background-color: var(--danger-color); color: white; }
+        .btn-get { background-color: #2196F3; color: white; }
+
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 960px;
+            text-align: center;
+            display: none;
+        }
+
+        iframe {
+            width: 100%;
+            height: 300px;
+            background: white;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Webserv Dashboard</h1>
+
+    <div id="status"></div>
+
+    <div class="container">
+        <div class="card">
+            <h2>📤 File Upload (POST)</h2>
+            <p>Saves files to <code>/uploads/</code></p>
+            <input type="file" id="fileInput">
+            <button class="btn-upload" onclick="uploadFile()">Upload File</button>
+        </div>
+
+        <div class="card">
+            <h2>🗑️ Delete File (DELETE)</h2>
+            <p>Removes files from <code>/uploads/</code></p>
+            <input type="text" id="deleteInput" placeholder="Filename (e.g., photo.jpg)">
+            <button class="btn-delete" onclick="deleteFile()">Delete File</button>
+        </div>
+
+        <div class="card">
+            <h2>🐍 CGI Test</h2>
+            <p>Executes a script on the server</p>
+            <button class="btn-get" onclick="window.open('/cgi-bin/test.py', '_blank')">Run CGI (New Tab)</button>
+        </div>
+
+        <div class="card" style="grid-column: 1 / -1;">
+            <h2>📂 Server Files (/uploads)</h2>
+            <iframe src="/uploads/" id="filesFrame"></iframe>
+            <button class="btn-get" onclick="refreshFrame()">Refresh List</button>
+        </div>
+    </div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const filesFrame = document.getElementById('filesFrame');
+
+        function showStatus(message, isError = false)
+        {
+            statusDiv.style.display = 'block';
+            statusDiv.style.backgroundColor = isError ? '#ffebee' : '#e8f5e9';
+            statusDiv.style.color = isError ? '#c62828' : '#2e7d32';
+            statusDiv.textContent = message;
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+        }
+
+        function refreshFrame()
+        {
+            filesFrame.src = filesFrame.src;
+        }
+        async function uploadFile()
+        {
+            const input = document.getElementById('fileInput');
+            if (input.files.length === 0) return showStatus("Select a file!", true);
+
+            const file = input.files[0];
+            const url = '/uploads/' + file.name;
+
+            try
+            {
+                const response = await fetch(url,
+                {
+                    method: 'POST',
+                    body: file 
+                });
+
+                if (response.ok) {
+                    showStatus(`Success! File ${file.name} uploaded.`);
+                    input.value = '';
+                    refreshFrame();
+                } else {
+                    showStatus(`Error uploading: ${response.status} ${response.statusText}`, true);
+                }
+            } catch (error) {
+                showStatus(`Network error: ${error.message}`, true);
+            }
+        }
+
+        async function deleteFile()
+        {
+            const filename = document.getElementById('deleteInput').value;
+            if (!filename) return showStatus("Enter the filename!", true);
+
+            const url = '/uploads/' + filename;
+
+            try {
+                const response = await fetch(url,
+                {
+                    method: 'DELETE'
+                });
+
+                if (response.ok || response.status === 204) {
+                    showStatus(`File ${filename} deleted successfully.`);
+                    document.getElementById('deleteInput').value = '';
+                    refreshFrame();
+                } else {
+                    showStatus(`Error deleting: ${response.status} ${response.statusText}`, true);
+                }
+            } catch (error) {
+                showStatus(`Network error: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 18:48:45 by sdavi-al          #+#    #+#             */
-/*   Updated: 2026/01/19 17:39:52 by sdavi-al         ###   ########.fr       */
+/*   Updated: 2026/01/20 12:32:07 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,8 @@ void runServer(const std::vector<ServerConfig>& servers)
     {
         int ret = poll(&fds[0], fds.size(), -1); 
 
-        if (ret < 0) throw std::runtime_error("poll Error");
+        if (ret < 0)
+            throw std::runtime_error("poll Error");
 
         for (size_t i = 0; i < fds.size(); i++)
         {
