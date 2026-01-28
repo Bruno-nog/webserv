@@ -6,7 +6,7 @@
 #    By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/12/18 14:31:51 by brunogue          #+#    #+#              #
-#    Updated: 2026/01/17 11:22:39 by sdavi-al         ###   ########.fr        #
+#    Updated: 2026/01/20 16:23:34 by sdavi-al         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,11 +14,13 @@ NAME = webserv
 
 CC = c++
 
-SRCS =  srcs/Client.cpp \
+SRCS =  srcs/CgiHandler.cpp \
+		srcs/Client.cpp \
 		srcs/ConfigParser.cpp \
 		srcs/main_loop.cpp \
 		srcs/main.cpp \
 		srcs/Request.cpp \
+		srcs/Response.cpp \
 		srcs/socket.cpp
 
 FLAGS = -Wall -Wextra -Werror -std=c++98 -I./includes

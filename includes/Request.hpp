@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/16 17:15:55 by sdavi-al          #+#    #+#             */
-/*   Updated: 2026/01/17 11:06:31 by sdavi-al         ###   ########.fr       */
+/*   Created: 2026/01/14 17:15:55 by sdavi-al          #+#    #+#             */
+/*   Updated: 2026/01/18 16:28:18 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,11 @@ private:
     std::string _httpVersion;
     std::map<std::string, std::string> _headers;
     std::string _body;
+    
     void parseRequestLine(const std::string& line);
     void parseHeaders(std::stringstream& ss);
+    void parseBody(const std::string& rawBody);
+    std::string decodeChunked(const std::string& rawBody);
     std::string trim(const std::string& str);
 
 public:

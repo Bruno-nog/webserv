@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   config.hpp                                         :+:      :+:    :+:   */
+/*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/17 11:05:23 by sdavi-al          #+#    #+#             */
-/*   Updated: 2026/01/17 11:05:40 by sdavi-al         ###   ########.fr       */
+/*   Created: 2026/01/15 11:05:23 by sdavi-al          #+#    #+#             */
+/*   Updated: 2026/01/18 16:29:14 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ struct LocationConfig
     std::string                 return_url;
     std::string                 cgi_path;
     std::string                 upload_path;
+    std::map<std::string, std::string> cgi_extensions;
     LocationConfig() : autoindex(false) {}
 };
 

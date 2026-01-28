@@ -39,18 +39,61 @@ void Request::parse(const std::string& rawData)
     if (std::getline(ss, line))
     {
         if (!line.empty() && line[line.size() - 1] == '\r')
-        {
             line.erase(line.size() - 1);
-        }
         parseRequestLine(line);
     }
 
     parseHeaders(ss);
-    std::string bodyPart;
-    while (std::getline(ss, bodyPart))
+
+    size_t headerEnd = rawData.find("\r\n\r\n");
+    if (headerEnd != std::string::npos)
     {
-        _body += bodyPart + "\n";
+        std::string rawBody = rawData.substr(headerEnd + 4);
+        parseBody(rawBody);
     }
+}
+
+void Request::parseBody(const std::string& rawBody)
+{
+    if (getHeader("Transfer-Encoding").find("chunked") != std::string::npos)
+    {
+        _body = decodeChunked(rawBody);
+    }
+    else
+    {
+        _body = rawBody;
+    }
+}
+
+std::string Request::decodeChunked(const std::string& rawBody)
+{
+    std::string decoded;
+    size_t i = 0;
+
+    while (i < rawBody.size())
+    {
+        size_t lineEnd = rawBody.find("\r\n", i);
+        if (lineEnd == std::string::npos) break;
+
+        std::string sizeStr = rawBody.substr(i, lineEnd - i);
+        long chunkSize = std::strtol(sizeStr.c_str(), NULL, 16);
+
+        if (chunkSize == 0) break;
+
+        i = lineEnd + 2;
+
+        if (i + chunkSize <= rawBody.size())
+        {
+            decoded.append(rawBody.substr(i, chunkSize));
+            i += chunkSize;
+        }
+
+        if (rawBody.substr(i, 2) == "\r\n")
+        {
+            i += 2;
+        }
+    }
+    return decoded;
 }
 
 void Request::parseRequestLine(const std::string& line)
@@ -63,17 +106,12 @@ void Request::parseRequestLine(const std::string& line)
 void Request::parseHeaders(std::stringstream& ss)
 {
     std::string line;
-    
     while (std::getline(ss, line))
     {
         if (!line.empty() && line[line.size() - 1] == '\r')
-        {
             line.erase(line.size() - 1);
-        }
-        if (line.empty())
-        {
-            break;
-        }
+        if (line.empty()) break;
+        
         size_t colonPos = line.find(':');
         if (colonPos != std::string::npos)
         {
@@ -87,23 +125,17 @@ void Request::parseHeaders(std::stringstream& ss)
 std::string Request::trim(const std::string& str)
 {
     size_t first = str.find_first_not_of(" \t");
-    if (std::string::npos == first)
-    {
-        return str;
-    }
+    if (std::string::npos == first) return str;
     size_t last = str.find_last_not_of(" \t");
     return str.substr(first, (last - first + 1));
 }
 
-void Request::debugPrint() const {
+void Request::debugPrint() const
+{
     std::cout << "--- REQUEST PARSED ---" << std::endl;
     std::cout << "Method: " << _method << std::endl;
     std::cout << "Path: " << _path << std::endl;
-    std::cout << "Version: " << _httpVersion << std::endl;
-    std::cout << "Headers:" << std::endl;
-    for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it) {
-        std::cout << "  " << it->first << ": " << it->second << std::endl;
-    }
-    std::cout << "Body Preview (first 50 chars): " << _body.substr(0, 50) << std::endl;
+    std::cout << "Chunked: " << (getHeader("Transfer-Encoding").find("chunked") != std::string::npos ? "Yes" : "No") << std::endl;
+    std::cout << "Body Size: " << _body.size() << std::endl;
     std::cout << "----------------------" << std::endl;
 }
