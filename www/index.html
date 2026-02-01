@@ -137,7 +137,8 @@
         <div class="card">
             <h2>🐍 CGI Test</h2>
             <p>Executes script on the server</p>
-            <button class="btn-get" onclick="window.open('/cgi-bin/test.py', '_blank')">Run CGI (New Tab)</button>
+            <input type="text" id="cgiInput" placeholder="test.py" value="test.py">
+            <button class="btn-get" onclick="runCgi()">Run CGI (New Tab)</button>
         </div>
 
         <div class="card" style="grid-column: 1 / -1;">
@@ -210,6 +211,12 @@
             } catch (error) {
                 showStatus(`Network error: ${error.message}`, true);
             }
+        }
+
+        function runCgi() {
+            const filename = document.getElementById('cgiInput').value;
+            if (!filename) return showStatus("Enter script name!", true);
+            window.open('/cgi-bin/' + filename, '_blank');
         }
     </script>
 </body>
