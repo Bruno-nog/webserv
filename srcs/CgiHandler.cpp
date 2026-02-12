@@ -18,32 +18,30 @@
 #include <sstream>
 #include <sys/wait.h>
 
-static std::string toString(long value)
-{
+static std::string toString(long value) {
   std::stringstream ss;
   ss << value;
   return ss.str();
 }
 
-CgiHandler::CgiHandler(Request &request, const std::string &scriptPath, const std::string &programPath) : _request(request), _scriptPath(scriptPath), _programPath(programPath), _pid(-1), _pipeOutFd(-1)
-{
+CgiHandler::CgiHandler(Request &request, const std::string &scriptPath,
+                       const std::string &programPath)
+    : _request(request), _scriptPath(scriptPath), _programPath(programPath),
+      _pid(-1), _pipeOutFd(-1) {
   _setupEnv();
 }
 
-CgiHandler::~CgiHandler()
-{
+CgiHandler::~CgiHandler() {
   if (_pipeOutFd != -1)
     close(_pipeOutFd);
 }
 
-void CgiHandler::setPathInfo(const std::string &pathInfo)
-{
+void CgiHandler::setPathInfo(const std::string &pathInfo) {
   _pathInfo = pathInfo;
   _setupEnv();
 }
 
-void CgiHandler::_setupEnv()
-{
+void CgiHandler::_setupEnv() {
   _env["REQUEST_METHOD"] = _request.getMethod();
   _env["CONTENT_LENGTH"] = toString(_request.getBody().size());
   _env["CONTENT_TYPE"] = _request.getHeader("Content-Type");

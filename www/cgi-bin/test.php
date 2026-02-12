@@ -9,3 +9,6 @@ foreach (getenv() as $key => $value) {
 }
 echo "</ul>";
 ?>
+
+
+<!-- sudo apt-get update && sudo apt-get install php-cgi -->
