@@ -6,7 +6,7 @@
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 11:12:20 by sdavi-al          #+#    #+#             */
-/*   Updated: 2026/01/27 18:02:11 by sdavi-al         ###   ########.fr       */
+/*   Updated: 2026/02/13 18:26:09 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,14 @@ void ConfigParser::parseLocation(ServerConfig &server) {
       loc.upload_path = nextToken();
       if (nextToken() != ";")
         throw std::runtime_error("Expected ';' after upload_path");
-    } else if (token == "cgi_extension")
+    } 
+    else if (token == "return") {
+    std::string code = nextToken();
+    loc.return_url = nextToken();
+    if (nextToken() != ";")
+        throw std::runtime_error("Expected ';' after return");
+}
+    else if (token == "cgi_extension")
     {
       std::string ext = nextToken();
       std::string prog = nextToken();

@@ -6,7 +6,7 @@
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 18:48:45 by sdavi-al          #+#    #+#             */
-/*   Updated: 2026/02/01 17:14:26 by sdavi-al         ###   ########.fr       */
+/*   Updated: 2026/02/13 15:50:56 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ ServerConfig &getServerConfig(int server_fd, const Request &req) {
 
   std::string host = req.getHeader("Host");
   size_t colonPos = host.find(':');
+
   if (colonPos != std::string::npos) {
     host = host.substr(0, colonPos);
   }
@@ -107,8 +108,7 @@ void runServer(const std::vector<ServerConfig> &servers) {
   if (server_fds.empty())
     throw std::runtime_error("No servers could be initialized.");
 
-  while (g_running)
-  {
+  while (g_running) {
     int ret = poll(&fds[0], fds.size(), -1);
 
     if (ret < 0) {
@@ -138,8 +138,7 @@ void runServer(const std::vector<ServerConfig> &servers) {
 
         Client *client = clients[client_fd];
 
-        if (fds[i].revents & (POLLIN | POLLHUP | POLLERR))
-        {
+        if (fds[i].revents & (POLLIN | POLLHUP | POLLERR)) {
           char buffer[4096];
           int bytes = read(fds[i].fd, buffer, sizeof(buffer));
           if (bytes > 0) {
@@ -167,8 +166,7 @@ void runServer(const std::vector<ServerConfig> &servers) {
         continue;
       }
 
-      if (is_server && (fds[i].revents & POLLIN))
-      {
+      if (is_server && (fds[i].revents & POLLIN)) {
         int client_fd = accept(fds[i].fd, NULL, NULL);
         if (client_fd >= 0) {
           setNonBlocking(client_fd);
@@ -205,7 +203,7 @@ void runServer(const std::vector<ServerConfig> &servers) {
           if (client->isRequestComplete() &&
               client->getState() == Client::READING_REQUEST) {
             client->processRequest();
-            // client->getRequest().debugPrint();
+            client->getRequest().debugPrint();
             std::cout << "Processing request for: "
                       << client->getRequest().getPath() << std::endl;
 
@@ -245,6 +243,15 @@ void runServer(const std::vector<ServerConfig> &servers) {
                           client->getResponseSize(), 0);
           if (sent > 0)
             client->markBytesSent(sent);
+          else {
+            close(fds[i].fd);
+            delete clients[fds[i].fd];
+            clients.erase(fds[i].fd);
+            client_to_server.erase(fds[i].fd);
+            fds.erase(fds.begin() + i);
+            i--;
+            continue;
+        }
         }
 
         if (!client->hasResponseToSend() &&

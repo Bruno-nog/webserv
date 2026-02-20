@@ -6,7 +6,7 @@
 /*   By: sdavi-al <sdavi-al@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 14:31:56 by brunogue          #+#    #+#             */
-/*   Updated: 2026/01/27 15:13:37 by sdavi-al         ###   ########.fr       */
+/*   Updated: 2026/02/13 17:37:20 by sdavi-al         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,3 +41,4 @@ int main(int argc, char **argv) {
 // curl -X POST -H "Content-Type: text/plain" --data "Este e um arquivo de teste" http://localhost:8080/uploads/teste.txt
 // curl -X DELETE http://localhost:8080/uploads/upload_
 // siege -b -t 10S http://localhost:8080/
+// curl --resolve example.com:8084:127.0.0.1 http://example.com:8084/

@@ -326,14 +326,19 @@ void Response::generateResponse()
             _buildErrorResponse(413);
             return;
         }
+        std::string pathOfFile = _request.getPath().c_str();
 
+        size_t findBar = pathOfFile.find_last_of('/');
+        std::string res;
+        if (findBar != std::string::npos)
+          res = pathOfFile.substr(findBar + 1);
         std::string uploadDir = root;
         if (location && !location->upload_path.empty())
         {
             uploadDir = location->upload_path;
         }
         
-        std::string filename = uploadDir + "/upload_" + intToString(clock());
+        std::string filename = uploadDir + "/" + res;
         std::string bodyToWrite = _request.getBody();
         
         std::string contentType = _request.getHeader("Content-Type");
